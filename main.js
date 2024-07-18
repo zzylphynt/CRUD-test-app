@@ -1,3 +1,4 @@
+import { usersApp } from "./src/users/users-app";
 import "./style.css";
 
 document.querySelector("#app").innerHTML = `
@@ -10,3 +11,5 @@ document.querySelector("#app").innerHTML = `
     
   </div>
 `;
+const element = document.querySelector(".card")
+usersApp(element);
