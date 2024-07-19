@@ -10,7 +10,7 @@ export const deleteUserById = async( id ) => {
         method: 'DELETE',
     });
 
-    const deleteResult = await res.json();
+    await res.json();
     return true;
 
 }
