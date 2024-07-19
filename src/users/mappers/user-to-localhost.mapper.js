@@ -1,10 +1,12 @@
 import { User } from '../models/user';
 
 /**
+ * Converts a User model object to a format suitable for local storage.
  * 
- * @param {User} user 
+ * @param {User} user - The User model object.
+ * @returns {Object} The user object formatted for local storage.
  */
-export const userModelToLocalhost = ( user ) => {
+export const userModelToLocalhost = (user) => {
 
     const {
         avatar,
@@ -24,6 +26,5 @@ export const userModelToLocalhost = ( user ) => {
         id,
         isActive,
         last_name: lastName,
-    }
-
+    };
 }

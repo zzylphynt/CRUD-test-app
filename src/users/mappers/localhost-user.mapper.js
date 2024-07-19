@@ -1,11 +1,12 @@
 import { User } from "../models/user"
 
 /**
+ * Converts a user object from the local storage format to the User model format.
  * 
- * @param {Like<User>} localhostUser 
- * @returns {User}
+ * @param {Like<User>} localhostUser - The user object from local storage.
+ * @returns {User} The converted User object.
  */
-export const localhostUserToModel = ( localhostUser ) => {
+export const localhostUserToModel = (localhostUser) => {
 
     const {
         avatar,
