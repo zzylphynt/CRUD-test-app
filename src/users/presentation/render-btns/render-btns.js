@@ -2,6 +2,16 @@ import usersStore from "../../store/users-store";
 import { renderTable } from "../render-table/render-table";
 import "./render-btns.css";
 
+export const updateBtnState = () => {
+  const nextBtn = document.querySelector("#next-btn");
+  const prevBtn = document.querySelector("#prev-btn");
+  const currentPageLabel = document.querySelector("#current-page");
+  const isUsersEmpty = usersStore.getUsers().length === 0;
+
+  nextBtn.disabled = usersStore.isLastPage() || isUsersEmpty;
+  prevBtn.disabled = usersStore.isFirstPage() || isUsersEmpty;
+  currentPageLabel.innerText = usersStore.getCurrentPage();
+};
 /**
  * Renders pagination buttons and updates the table based on the current page.
  *
@@ -10,10 +20,12 @@ import "./render-btns.css";
 export const renderBtns = (element) => {
   // Create the "Next" button
   const nextBtn = document.createElement("button");
+  nextBtn.id = "next-btn"
   nextBtn.innerText = " Next >";
 
   // Create the "Previous" button
   const prevBtn = document.createElement("button");
+  prevBtn.id = "prev-btn"
   prevBtn.innerText = "< Previous ";
 
   // Create and display the current page label
@@ -23,11 +35,6 @@ export const renderBtns = (element) => {
 
   // Append buttons and label to the provided element
   element.append(prevBtn, currentPageLabel, nextBtn);
-  const updateBtnState = () => {
-    nextBtn.disabled = usersStore.isLastPage();
-    prevBtn.disabled = usersStore.isFirstPage();
-    currentPageLabel.innerText = usersStore.getCurrentPage();
-  };
 
   //init update state
   updateBtnState();
