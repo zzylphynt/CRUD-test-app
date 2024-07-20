@@ -1,104 +1,77 @@
 import { loadUsersByPage } from "../use-cases/load-users-by-page";
 
-const state = {
-  currentPage: 0,
-  totalPage: 0,
-  users: [],
-};
+class UsersStore {
+  constructor() {
+    this.state = {
+      currentPage: 0,
+      users: [],
+      totalPages: -1,
+    };
+  }
 
-/**
- * Loads the next page of users and updates the current page state.
- *
- * @returns {Promise<void>}
- */
-const loadNextPage = async () => {
-  const { users, totalPages } = await loadUsersByPage(state.currentPage + 1);
-  if (users.length === 0) return;
+  async loadPage(page = 1) {
+    const { users, totalPages } = await loadUsersByPage(page);
 
-  state.currentPage += 1;
-  state.totalPage = totalPages;
-  state.users = users;
-};
-/**
- * Loads the previous page of users and updates the current page state.
- *
- * @returns {Promise<void>}
- */
-const loadPreviousPage = async () => {
-  if (state.currentPage === 1) return;
-  const { users, totalPages } = await loadUsersByPage(state.currentPage - 1);
+    this.state.currentPage = page;
+    this.state.users = users;
+    this.state.totalPages = totalPages;
+  }
 
-  state.currentPage -= 1;
-  state.totalPage = totalPages;
-  state.users = users;
-};
+  async loadNextPage() {
+    if (this.isLastPage()) return;
+    await this.loadPage(this.state.currentPage + 1);
+  }
 
-/**
- * Updates the state with an updated user. Adds the user if not found and less than 10 users are in the state.
- *
- * @param {User} updatedUser - The user object with updated data.
- */
-const onUserChanged = (updatedUser) => {
-  let wasFound = false;
+  async loadPreviousPage() {
+    if (this.isFirstPage()) return;
+    await this.loadPage(this.state.currentPage - 1);
+  }
 
-  state.users = state.users.map((user) => {
-    if (user.id === updatedUser.id) {
-      wasFound = true;
-      return updatedUser;
+  async reloadPage() {
+   await this.loadPage(this.state.currentPage);
+  }
+
+  async removeUserAndAdjustPage(userId) {
+    this.state.users = this.state.users.filter((user) => user.id !== userId);
+
+    if (this.state.users.length === 0 && this.state.currentPage > 1) {
+      await this.loadPreviousPage();
+    } else {
+      await this.reloadPage();
     }
-    return user;
-  });
-
-  if (state.users.length < 10 && !wasFound) {
-    state.users.push(updatedUser);
-  }
-};
-
-/**
- * Reloads the current page of users. If no users are found, it loads the previous page.
- *
- * @returns {Promise<void>}
- */
-const reloadPage = async () => {
-  const { users, totalPages } = await loadUsersByPage(state.currentPage);
-  if (users.length === 0) {
-    await loadPreviousPage();
-    return;
   }
 
-  state.totalPage = totalPages;
-  state.users = users;
-};
+  onUserChanged = (updatedUser) => {
+    let wasFound = false;
 
-export default {
-  loadNextPage,
-  loadPreviousPage,
-  onUserChanged,
-  reloadPage,
+    this.state.users = this.state.users.map((user) => {
+      if (user.id === updatedUser.id) {
+        wasFound = true;
+        return updatedUser;
+      }
+      return user;
+    });
 
-  /**
-   * Returns a copy of the users array from the state.
-   *
-   * @returns {User[]}
-   */
-  getUsers: () => [...state.users],
+    if (this.state.users.length < 10 && !wasFound) {
+      this.state.users.push(updatedUser);
+    }
+  }
 
-  /**
-   * Returns the current page number from the state.
-   *
-   * @returns {number}
-   */
-  getCurrentPage: () => state.currentPage,
+  getUsers() {
+    return [...this.state.users];
+  }
 
-  /**
-   * Check if the current page is the first page.
-   * @returns {boolean}
-   */
-  isFirstPage: () => state.currentPage === 1,
+  getCurrentPage() {
+    return this.state.currentPage;
+  }
 
-  /**
-   * Check if the current page is the last page.
-   * @returns {boolean}
-   */
-  isLastPage: () => state.currentPage === state.totalPage,
-};
+  isFirstPage() {
+    return this.state.currentPage === 1;
+  }
+
+  isLastPage() {
+    return this.state.currentPage === this.state.totalPages;
+  }
+}
+
+export default new UsersStore();
