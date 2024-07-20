@@ -4,7 +4,7 @@ import "./render-btns.css";
 
 /**
  * Renders pagination buttons and updates the table based on the current page.
- * 
+ *
  * @param {HTMLElement} element - The DOM element to which the pagination buttons will be appended.
  */
 export const renderBtns = (element) => {
@@ -23,18 +23,26 @@ export const renderBtns = (element) => {
 
   // Append buttons and label to the provided element
   element.append(prevBtn, currentPageLabel, nextBtn);
+  const updateBtnState = () => {
+    nextBtn.disabled = usersStore.isLastPage();
+    prevBtn.disabled = usersStore.isFirstPage();
+    currentPageLabel.innerText = usersStore.getCurrentPage();
+  };
+
+  //init update state
+  updateBtnState();
 
   // Add event listener to the "Next" button to load and display the next page
   nextBtn.addEventListener("click", async () => {
     await usersStore.loadNextPage();
-    currentPageLabel.innerText = usersStore.getCurrentPage();
+    updateBtnState();
     renderTable(element);
   });
 
   // Add event listener to the "Previous" button to load and display the previous page
   prevBtn.addEventListener("click", async () => {
     await usersStore.loadPreviousPage();
-    currentPageLabel.innerText = usersStore.getCurrentPage();
+    updateBtnState();
     renderTable(element);
   });
 };
