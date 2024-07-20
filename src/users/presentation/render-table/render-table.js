@@ -2,6 +2,7 @@ import usersStore from '../../store/users-store';
 import { showModal } from '../render-modal/render-modal';
 import { deleteUserById } from '../../use-cases/delete-user-by-id';
 import './render-table.css';
+import { updateBtnState } from '../render-btns/render-btns';
 
 let table;
 
@@ -54,8 +55,9 @@ const tableDeleteListener = async (event) => {
     const id = element.getAttribute('data-id');
     try {
         await deleteUserById(id);
-        await usersStore.reloadPage();
+        await usersStore.removeUserAndAdjustPage(id)
         document.querySelector('#current-page').innerText = usersStore.getCurrentPage();
+        updateBtnState()
         renderTable(document.querySelector('#table-container')); // Assuming the table is within #table-container
     } catch (error) {
         console.log(error);
